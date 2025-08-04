@@ -1,0 +1,20 @@
+﻿@page "/usersmanager"
+
+<h3>Users</h3>
+
+
+
+
+@code {
+
+    public List<User> users { get; set; } = new List<User>();
+
+
+
+    public async Task LoadUsers()
+    {
+        users = IDFManager.userService.GetAll(false);
+
+    }
+
+}

@@ -2,6 +2,32 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<button @onclick="LoadRoleModels">Load Role Models</button>
 
-Welcome to your new app.
+
+@if(AIModels is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+
+    @foreach(AIModel m in AIModels )
+    {
+        <li>@m.Title</li>
+    }
+    </ul>
+}
+
+@code{
+
+    public List<AIModel> AIModels { get; set; }
+
+    public void LoadRoleModels()
+    {
+        DAL.MLProxyContext db = new();
+        List<RoleModelPermission> roleModelPermissions = db.RoleModelPermissions.Where(o => o.Role.Title.ToLower() == "role1").Include(o => o.AIModel).ToList();
+        AIModels = roleModelPermissions.Select(o => o.AIModel).ToList();
+    }
+}

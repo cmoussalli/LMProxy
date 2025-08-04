@@ -1,4 +1,7 @@
+using CMouss.IdentityFramework;
 using MLProxy.Components;
+using MLProxy.DAL;
+using App = MLProxy.Components.App;
 
 namespace MLProxy
 {
@@ -24,7 +27,7 @@ namespace MLProxy
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseAntiforgery();
 
@@ -33,6 +36,43 @@ namespace MLProxy
                 .AddInteractiveServerRenderMode();
 
             app.MapControllers();
+
+
+
+            IDFManager.Configure(new IDFManagerConfig
+            {
+                DatabaseType = DatabaseType.SQLite,
+                //DBConnectionString = "Server=projcetbravossql.database.windows.net;Database=ProjectBravos;User Id=BravosAdmin;Password=BPl@yer23212;",
+                DBConnectionString = "Data Source=database.db;",
+                DefaultListPageSize = 25,
+                DBLifeCycle = DBLifeCycle.Both,
+                IsActiveByDefault = true,
+                IsLockedByDefault = false,
+                DefaultTokenLifeTime = new LifeTime(365, 0, 0),
+                AllowUserMultipleSessions = true,
+                TokenEncryptionKey = "Medi@22222",
+                TokenValidationMode = TokenValidationMode.DecryptOnly,
+                AdministratorUserName = "admin",
+                AdministratorPassword = "Medi@22222",
+                AdministratorRoleName = "Administrators",
+                IDGeneratorLevel = IDGeneratorLevel.Guid32
+
+            });
+            MLProxyContext db = new MLProxyContext();
+            db.Database.EnsureCreated();
+            IDFManager.Context = new();
+
+
+            db.InsertMasterData();
+            //HotFix for IDFManager
+            IDFManager.RefreshIDFStorage();
+
+            if (db.Roles.Count() == 1)
+            {
+                db.InsertDemoData();
+            }
+
+
 
             app.Run();
         }
